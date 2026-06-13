@@ -91,11 +91,16 @@ pipeline {
     }
 
     post {
-        success {
-            echo "SUCCESS: Image pushed -> ${IMAGE_URI}"
-        }
-        failure {
-            echo "FAILURE: Pipeline failed."
-        }
+    success {
+        echo "SUCCESS: Image pushed and deployed -> ${IMAGE_URI}"
     }
+
+    failure {
+        sh '''
+            echo "Deployment failed. Rolling back..."
+            kubectl rollout undo deployment/java-app -n dev || true
+        '''
+        echo "FAILURE: Pipeline failed."
+    }
+}
 }
