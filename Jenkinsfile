@@ -64,6 +64,20 @@ pipeline {
             }
         }
 
+        stage('Deploy to EKS') {
+            steps {
+              sh '''
+                    echo "Deploying latest image to EKS..."
+
+                    kubectl set image deployment/java-app \
+                    java-app=${IMAGE_URI} \
+                    -n dev
+
+                    kubectl rollout status deployment/java-app -n dev
+                '''
+        }
+    }
+        
         stage('Cleanup') {
             steps {
                 sh '''
